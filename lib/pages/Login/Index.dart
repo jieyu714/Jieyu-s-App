@@ -47,6 +47,7 @@ class _LoginPageState extends State<LoginPage> {
         ProgressDialog().showResult(context, message: "登入成功", isSuccess: true, onClose: () {
           // TODO: 處理登入成功後的邏輯
           print("登入成功，執行後續操作");
+          Navigator.pushNamed(context, "/home");
         });
       });
     }

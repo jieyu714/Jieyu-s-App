@@ -68,18 +68,15 @@ class ProgressDialog {
                   ),
                 SizedBox(height: 20),
                 Text(message),
-                ButtonBar(
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context, rootNavigator: true).pop();
-                        if (onClose != null) onClose();
-                      },
-                      child: Text("確認"),
-                    ),
-                  ],
+                SizedBox(height: 20),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    if (onClose != null) onClose();
+                  },
+                  child: Text("確認"),
                 )
-              ],
+              ]
             ),
           ),
         );
