@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:jieyu_app/api/AuthApi.dart';
 import 'package:jieyu_app/api/BaseApi.dart';
 import 'package:jieyu_app/utils/CustomCheckBox.dart';

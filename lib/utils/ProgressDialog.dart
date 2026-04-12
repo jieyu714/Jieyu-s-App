@@ -1,12 +1,11 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 
 class _AnimatedEllipsisText extends StatefulWidget {
   final String text;
   final TextStyle? style;
-  const _AnimatedEllipsisText({super.key, required this.text, this.style});
+  const _AnimatedEllipsisText({required this.text, this.style});
 
   @override
   State<_AnimatedEllipsisText> createState() => _AnimatedEllipsisTextState();

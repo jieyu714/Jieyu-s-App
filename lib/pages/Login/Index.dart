@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:jieyu_app/api/AuthApi.dart';
 import 'package:jieyu_app/api/BaseApi.dart';
+import 'package:jieyu_app/utils/AppVersion.dart';
 import 'package:jieyu_app/utils/CustomCheckBox.dart';
 import 'package:jieyu_app/utils/CustomTextField.dart';
 import 'package:jieyu_app/utils/PasswordHelper.dart';
@@ -26,6 +26,17 @@ class _LoginPageState extends State<LoginPage> {
   final RegExp _passwordRegex = RegExp(r'^[a-zA-Z0-9!@?_]{8,}$');
 
   final AuthApi _api = AuthApi();
+  String _appVersion = "";
+  
+  @override
+  void initState() {
+    super.initState();
+    getAppVersion().then((value) {
+      setState(() {
+        _appVersion = value;
+      });
+    });
+  }
 
   void _loginFormatCheck() async {
     if (_usernameController.text.isEmpty || _passwordController.text.isEmpty) {
@@ -199,6 +210,20 @@ class _LoginPageState extends State<LoginPage> {
                 ],
               ),
             ),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 10,
+              child: Container(
+                alignment: Alignment.center,
+                child: Text(
+                  _appVersion,
+                  style: TextStyle(
+                    color: Colors.grey[400]
+                  ),
+                ),
+              ),
+            )
           ],
         ),
       ),
