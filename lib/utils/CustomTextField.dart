@@ -5,16 +5,22 @@ class CustomTextField extends StatefulWidget {
   final String labelText;
   final String hintText;
   final TextEditingController controller;
+  final FocusNode? focus;
   final bool obscureText;
   final int? maxLength;
+  final Function? onSubmitted;
+  final TextInputAction textInputAction;
 
   const CustomTextField({
     super.key,
     required this.labelText,
     this.hintText = "",
     required this.controller,
+    this.focus,
     this.obscureText = false,
     this.maxLength,
+    this.onSubmitted,
+    this.textInputAction = TextInputAction.done
   });
 
   @override
@@ -37,7 +43,9 @@ class _CustomTextFieldState extends State<CustomTextField> {
       children: [
         TextField(
           controller: widget.controller,
+          focusNode: widget.focus,
           obscureText: _isObscured,
+          textInputAction: widget.textInputAction,
           maxLength: widget.maxLength,
           decoration: InputDecoration(
             labelText: widget.labelText,
@@ -58,8 +66,13 @@ class _CustomTextFieldState extends State<CustomTextField> {
               borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2),
             ),
           ),
+          onSubmitted: (value) {
+            if (widget.onSubmitted != null) {
+              widget.onSubmitted!();
+            }
+          },
         ),
-        Padding(
+        ?widget.hintText.isNotEmpty ? Padding(
           padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
           child: Text(
             widget.hintText,
@@ -68,7 +81,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
               fontSize: 10,
             ),
           )
-        )
+        ) : null
       ],
     );
   }

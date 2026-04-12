@@ -39,6 +39,10 @@ dependencies:
   shared_preferences: ^2.5.5
   geolocator: ^14.0.2
   intl: ^0.20.2
+  geocoding: ^4.0.0
+  http: ^1.6.0
+  wakelock_plus: ^1.5.1
+  crypto: ^3.0.7
 
 dev_dependencies:
   flutter_test:

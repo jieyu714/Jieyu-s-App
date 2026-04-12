@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:jieyu_app/pages/Home/Index.dart';
 import 'package:jieyu_app/pages/Location/Index.dart';
 import 'package:jieyu_app/pages/Login/Index.dart';
+import 'package:jieyu_app/pages/Otp/Index.dart';
+import 'package:jieyu_app/pages/Registration/Index.dart';
 
 Widget getRootWidget() {
   const Color themeColor = Colors.lightBlueAccent;
 
   return MaterialApp(
-    initialRoute: "/home",
+    initialRoute: "/login",
     routes: getRootRoutes(),
+    onUnknownRoute: (settings) => MaterialPageRoute(builder: (context) => HomePage()),
     theme: ThemeData(
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
@@ -21,7 +24,10 @@ Widget getRootWidget() {
 
 Map<String, Widget Function(BuildContext)> getRootRoutes() {
   return {
-    "/": (context) => LoginPage(),
+    "/login": (context) => LoginPage(),
+    "/registration": (context) => RegistrationPage(),
+    "/otp": (context) => OtpPage(),
+
     "/home": (context) => HomePage(),
     "/location": (context) => Location(),
   };

@@ -46,7 +46,7 @@ class _AppsFragementState extends State<AppsFragement> {
             },
             child: ListTile(
               leading: Icon(app.icon as IconData),
-              title: Text(app.name!),
+              title: Text(app.name!, style: TextStyle(color: app.page != null ? Theme.of(context).colorScheme.primary : Colors.grey)),
             ),
           );
         },
