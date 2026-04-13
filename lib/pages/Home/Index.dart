@@ -16,11 +16,25 @@ class _HomePageState extends State<HomePage> {
   List<IconData> _navigationIcons = [Icons.home, Icons.apps, Icons.person];
   int _currentIndex = 0;
 
+  late PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: _currentIndex);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
   List<Widget> _buildPages() {
     return [
-      Center(child: HomeFragement()),
-      Center(child: AppsFragement()),
-      Center(child: MineFragement()),
+      HomeFragement(),
+      AppsFragement(),
+      MineFragement(),
     ];
   }
 
@@ -28,17 +42,24 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: IndexedStack(
-          index: _currentIndex,
+        child: PageView(
+          controller: _pageController,
+          onPageChanged: (value) => {
+            setState(() {
+              _currentIndex = value;
+            })
+          },
           children: _buildPages(),
         )
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (value) => {
-          setState(() {
-            _currentIndex = value;
-          })
+          _pageController.animateToPage(
+            value,
+            duration: Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+          )
         },
         items: List.generate(_navigationIcons.length, (index) {
           return BottomNavigationBarItem(

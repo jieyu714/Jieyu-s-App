@@ -30,6 +30,8 @@ class _OtpPageState extends State<OtpPage> {
 
   @override
   void dispose() {
+    _otpController.dispose();
+    _requestOtpController.dispose();
     _timer?.cancel();
     super.dispose();
   }
@@ -68,7 +70,7 @@ class _OtpPageState extends State<OtpPage> {
 
       if (!mounted) return;
       ProgressDialog().showResult(context, message: "發送成功", isSuccess: true);
-    } on ApiException catch (e) {
+    } on ApiResponse catch (e) {
       if (!mounted) return;
       ProgressDialog().showResult(context, message: e.message, isError: true);
     } catch (e) {
@@ -103,7 +105,7 @@ class _OtpPageState extends State<OtpPage> {
         isSuccess: true,
         onClose: () => Navigator.of(context).pushNamedAndRemoveUntil("/login", (Route<dynamic> router) => false)
       );
-    } on ApiException catch (e) {
+    } on ApiResponse catch (e) {
       if (!mounted) return;
       ProgressDialog().showResult(context, message: e.message, isError: true);
     } catch (e) {
@@ -117,6 +119,7 @@ class _OtpPageState extends State<OtpPage> {
     final Map<String, dynamic> data = (ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>);
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Stack(
           children: [

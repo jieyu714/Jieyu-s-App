@@ -22,7 +22,7 @@ class _AppsFragementState extends State<AppsFragement> {
     App(name: "穿衣搭配", icon: Icons.checkroom),
     App(name: "行程規劃", icon: Icons.event),
     App(name: "SOP紀錄", icon: Icons.description),
-    App(name: "待辦清單", icon: Icons.check_box),
+    App(name: "待辦清單", icon: Icons.check_box, page: "/task"),
     App(name: "心情紀錄", icon: Icons.mood),
     App(name: "記帳", icon: Icons.account_balance),
     App(name: "飲食紀錄", icon: Icons.restaurant),

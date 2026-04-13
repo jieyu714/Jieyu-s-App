@@ -10,4 +10,8 @@ class HttpConstants {
   static const String REGISTRATION_ENDPOINT = '/auth/registration';
   static const String RESEND_OTP_ENDPOINT = '/auth/resendOtp';
   static const String VERIFY_OTP_ENDPOINT = '/auth/verifyOtp';
+  static const String GET_TASK_ENDPOINT = '/task/getTask';
+  static const String ADD_TASK_ENDPOINT = '/task/addTask';
+  static const String UPDATE_TASK_ENDPOINT = '/task/updateTask';
+  static const String DELETE_TASK_ENDPOINT = '/task/deleteTask';
 }

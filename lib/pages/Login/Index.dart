@@ -19,7 +19,6 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   final CustomCheckBoxController _checkboxController = CustomCheckBoxController();
 
-  final FocusNode _usernameFocus = FocusNode();
   final FocusNode _passwordFocus = FocusNode();
 
   final RegExp _usernameRegex = RegExp(r'^[a-zA-Z][a-zA-Z0-9_]{4,20}$');
@@ -36,6 +35,14 @@ class _LoginPageState extends State<LoginPage> {
         _appVersion = value;
       });
     });
+  }
+
+  void ondispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    _checkboxController.dispose();
+    _passwordFocus.dispose();
+    super.dispose();
   }
 
   void _loginFormatCheck() async {
@@ -74,7 +81,7 @@ class _LoginPageState extends State<LoginPage> {
           isSuccess: true,
           onClose: () => Navigator.of(context).pushNamedAndRemoveUntil("/home", (Route<dynamic> router) => false),
         );
-      } on ApiException catch (e) {
+      } on ApiResponse catch (e) {
         if (!mounted) return;
         ProgressDialog().showResult(context, message: e.message, isError: true);
       } catch (e) {
@@ -87,6 +94,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Stack(
           children: [
@@ -144,7 +152,6 @@ class _LoginPageState extends State<LoginPage> {
                         CustomTextField(
                           labelText: '使用者名稱',
                           controller: _usernameController,
-                          focus: _usernameFocus,
                           textInputAction: TextInputAction.next,
                           onSubmitted: () => FocusScope.of(context).requestFocus(_passwordFocus),
                         ),

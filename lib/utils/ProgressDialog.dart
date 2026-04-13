@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class _AnimatedEllipsisText extends StatefulWidget {
@@ -92,6 +91,8 @@ class ProgressDialog {
   DateTime? _startTime;
   int _minDuration = 0;
 
+  bool isShowing() => _isShowing;
+
   void showLoading(
     BuildContext context,
     {
@@ -162,9 +163,7 @@ class ProgressDialog {
                 SizedBox(height: 20),
                 TextButton(
                   onPressed: () async {
-                    debugPrint("close one");
                     await hide(dialogContext);
-                    debugPrint("close two");
                     if (onClose != null) onClose();
                   },
                   child: Text("確認"),
@@ -213,7 +212,6 @@ class ProgressDialog {
     _setInfo(false, null, 0);
 
     if (context.mounted) {
-      debugPrint("close three");
       Navigator.of(context, rootNavigator: true).pop();
     }
   }

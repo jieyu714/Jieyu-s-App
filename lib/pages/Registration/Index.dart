@@ -20,7 +20,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final TextEditingController _confirmPasswordController = TextEditingController();
   final CustomCheckBoxController _checkboxController = CustomCheckBoxController();
 
-  final FocusNode _emailFocus = FocusNode();
   final FocusNode _usernameFocus = FocusNode();
   final FocusNode _passwordFocus = FocusNode();
   final FocusNode _confirmPasswordFocus = FocusNode();
@@ -30,6 +29,19 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final RegExp _usernameRegex = RegExp(r"^[a-zA-Z][a-zA-Z0-9_]{4,20}$");
   final RegExp _passwordRegex = RegExp(r"^[a-zA-Z0-9!@?_]{8,}$");
   final RegExp _emailRegex = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    _checkboxController.dispose();
+    _usernameFocus.dispose();
+    _passwordFocus.dispose();
+    _confirmPasswordFocus.dispose();
+    super.dispose();
+  }
 
   void _registrationFormatCheck() async {
     if (_emailController.text.isEmpty || _usernameController.text.isEmpty || _passwordController.text.isEmpty || _confirmPasswordController.text.isEmpty) {
@@ -76,7 +88,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
       if (!mounted) return;
       await ProgressDialog().hide(context);
       Navigator.of(context).pushNamed("/otp", arguments: {"email": _emailController.text});
-    } on ApiException catch (e) {
+    } on ApiResponse catch (e) {
       if (!mounted) return;
       ProgressDialog().showResult(context, message: e.message, isError: true);
     } catch (e) {
@@ -88,6 +100,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Stack(
           children: [
@@ -145,7 +158,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         CustomTextField(
                           labelText: '電子信箱',
                           controller: _emailController,
-                          focus: _emailFocus,
                           textInputAction: TextInputAction.next,
                           onSubmitted: () => FocusScope.of(context).requestFocus(_usernameFocus)
                         ),
