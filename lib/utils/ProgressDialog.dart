@@ -93,7 +93,7 @@ class ProgressDialog {
 
   bool isShowing() => _isShowing;
 
-  void showLoading(
+  Future<bool> showLoading(
     BuildContext context,
     {
       String title = "載入中...",
@@ -103,6 +103,8 @@ class ProgressDialog {
     if (_isShowing) await hide(context);
 
     _setInfo(true, minDuration > 0 ? DateTime.now() : null, minDuration);
+
+    if (!context.mounted) return false;
 
     showDialog(
       context: context,
@@ -128,9 +130,11 @@ class ProgressDialog {
         );
       },
     );
+
+    return true;
   }
 
-  void showResult(
+  Future<bool> showResult(
     BuildContext context,
     {
       String message = "",
@@ -142,6 +146,8 @@ class ProgressDialog {
     if (_isShowing) await hide(context);
 
     _setInfo(true, null, 0);
+
+    if (!context.mounted) return false;
 
     showDialog(
       context: context,
@@ -174,6 +180,8 @@ class ProgressDialog {
         );
       },
     );
+
+    return true;
   }
 
   Widget _buildResultHeader(IconData icon, Color color, String title) {
@@ -204,8 +212,8 @@ class ProgressDialog {
     _minDuration = minDuration;
   }
 
-  Future<void> hide(BuildContext context) async {
-    if (!_isShowing) return;
+  Future<bool> hide(BuildContext context) async {
+    if (!_isShowing) return false;
 
     await _checkMinDuration();
 
@@ -214,5 +222,7 @@ class ProgressDialog {
     if (context.mounted) {
       Navigator.of(context, rootNavigator: true).pop();
     }
+
+    return true;
   }
 }

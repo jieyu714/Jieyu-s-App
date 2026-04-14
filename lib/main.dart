@@ -12,5 +12,5 @@ void main() async {
     });
   }  
   
-  runApp(getRootWidget());
+  runApp(await getRootWidget());
 }

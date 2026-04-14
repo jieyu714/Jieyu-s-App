@@ -1,5 +1,9 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jieyu_app/api/BaseApi.dart';
 import 'package:jieyu_app/constants/Index.dart';
+import 'package:jieyu_app/utils/SecurityStorageService.dart';
 
 class AuthApi {
   final BaseApi _baseApi = BaseApi();
@@ -64,13 +68,48 @@ class AuthApi {
   /// @param passwordHash 使用者密碼的哈希值
   /// @return 返回包含 User Info 與 Token 的 Map
   Future<ApiResponse<Map<String, dynamic>>> login(String username, String passwordHash) async {
-    return _baseApi.request<Map<String, dynamic>>(
+    final result = await _baseApi.request<Map<String, dynamic>>(
       HttpConstants.LOGIN_ENDPOINT,
       {
         "username": username,
         "passwordHash": passwordHash
       },
       (data) => data as Map<String, dynamic>
+    );
+    
+    if (result.isSuccess && result.data != null) {
+      if (result.data!["token"] != null) {
+        await SecurityStorageService().writeData("token", result.data!["token"]);
+      }
+      if (result.data!["username"] != null) {
+        await SecurityStorageService().writeData("username", result.data!["username"]);
+      }
+      if (result.data!["id"] != null) {
+        await SecurityStorageService().writeData("id", result.data!["id"]);
+      }
+    }
+
+    return result;
+  }
+
+  Future<bool> verifyToken() async {
+    return (await _baseApi.request<Map<String, dynamic>>(
+      HttpConstants.VERIFY_TOKEN_ENDPOINT,
+      {},
+      (data) => data as Map<String, dynamic>
+    )).isSuccess;
+  }
+
+  Future<void> logout(BuildContext context) async {    
+    try {
+      await _baseApi.request(
+        HttpConstants.LOGOUT_ENDPOINT, 
+        {}, 
+        (data) => data
       );
+    } finally {
+      await SecurityStorageService().clearAll();
+      Navigator.pushNamedAndRemoveUntil(context, "/login", (route) => false);
+    }
   }
 }

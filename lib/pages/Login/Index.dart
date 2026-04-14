@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jieyu_app/api/AuthApi.dart';
 import 'package:jieyu_app/api/BaseApi.dart';
 import 'package:jieyu_app/utils/AppVersion.dart';
@@ -6,6 +7,7 @@ import 'package:jieyu_app/utils/CustomCheckBox.dart';
 import 'package:jieyu_app/utils/CustomTextField.dart';
 import 'package:jieyu_app/utils/PasswordHelper.dart';
 import 'package:jieyu_app/utils/ProgressDialog.dart';
+import 'package:jieyu_app/utils/SecurityStorageService.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -17,7 +19,8 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final CustomCheckBoxController _checkboxController = CustomCheckBoxController();
+  final CustomCheckBoxController _acceptTermsController = CustomCheckBoxController();
+  final CustomCheckBoxController _rememberMeController = CustomCheckBoxController();
 
   final FocusNode _passwordFocus = FocusNode();
 
@@ -35,12 +38,38 @@ class _LoginPageState extends State<LoginPage> {
         _appVersion = value;
       });
     });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      _checkToken();
+    });
+  }
+
+  void _checkToken() async {
+    if (!(await SecurityStorageService().hasData("token")) || !mounted) return;
+
+    await ProgressDialog().showLoading(context, title: "驗證登入資訊中...", minDuration: 2);
+    
+    try {
+      if (await _api.verifyToken()) {
+        if (!mounted) return;
+        ProgressDialog().showResult(
+          context,
+          message: "登入成功",
+          isSuccess: true,
+          onClose: () => Navigator.of(context).pushReplacementNamed("/home")
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ProgressDialog().hide(context);
+    }
   }
 
   void ondispose() {
     _usernameController.dispose();
     _passwordController.dispose();
-    _checkboxController.dispose();
+    _acceptTermsController.dispose();
+    _rememberMeController.dispose();
     _passwordFocus.dispose();
     super.dispose();
   }
@@ -49,7 +78,7 @@ class _LoginPageState extends State<LoginPage> {
     if (_usernameController.text.isEmpty || _passwordController.text.isEmpty) {
       ProgressDialog().showResult(context, message: "請填寫所有欄位", isError: true);
       return;
-    } else if (!_checkboxController.isChecked) {
+    } else if (!_acceptTermsController.isChecked) {
       ProgressDialog().showResult(context, message: "請同意使用者協議與隱私政策", isError: true);
       return;
     }
@@ -74,6 +103,7 @@ class _LoginPageState extends State<LoginPage> {
     } else {
       try {
         await _api.login(_usernameController.text, PasswordHelper().hashPassword(_passwordController.text));
+        
         if (!mounted) return;
         ProgressDialog().showResult(
           context,
@@ -164,8 +194,13 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         SizedBox(height: 10),
                         CustomCheckBox(
-                          controller: _checkboxController,
+                          controller: _acceptTermsController,
                           label: "已詳閱並同意《使用者協議》與《隱私政策》",
+                          size: 10
+                        ),
+                        CustomCheckBox(
+                          controller: _rememberMeController,
+                          label: "記住帳號與密碼",
                           size: 10
                         ),
                         Row(

@@ -26,7 +26,7 @@ class _AppsFragementState extends State<AppsFragement> {
     App(name: "心情紀錄", icon: Icons.mood),
     App(name: "記帳", icon: Icons.account_balance),
     App(name: "飲食紀錄", icon: Icons.restaurant),
-    App(name: "金額分帳", icon: Icons.splitscreen),
+    App(name: "欠還款紀錄", icon: Icons.splitscreen),
   ];
 
   @override

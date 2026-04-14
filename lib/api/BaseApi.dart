@@ -2,8 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:jieyu_app/constants/Index.dart';
+import 'package:jieyu_app/utils/SecurityStorageService.dart';
 
 class ApiResponse<T> implements Exception {
   final int? statusCode;
@@ -32,7 +36,7 @@ class ApiResponse<T> implements Exception {
 
     try {
       final decoded = (body is String && body.isNotEmpty) ? jsonDecode(body) : body;
-      
+
       if (decoded is Map) {
         final map = decoded.containsKey('detail') ? decoded['detail'] : decoded;
         
@@ -43,7 +47,7 @@ class ApiResponse<T> implements Exception {
         }
       }
     } catch (_) {}
-
+    
     return ApiResponse<T>(
       statusCode: httpCode,
       status: apiStatus,
@@ -56,11 +60,43 @@ class ApiResponse<T> implements Exception {
 class BaseApi {
   final String baseUrl = GlobalConstants.API_BASE_URL;
   final http.Client _httpClient;
+  
+  final DeviceInfoPlugin _deviceInfo = DeviceInfoPlugin();
+
+  String? _token;
+  String? _deviceId;
 
   BaseApi({http.Client? httpClient}) : _httpClient = httpClient ?? http.Client();
 
+  Future<String> _getDeviceId() async {
+    if (_deviceId != null) return _deviceId!;
+
+    try {
+      if (Platform.isAndroid) {
+        final androidInfo = await _deviceInfo.androidInfo;
+        _deviceId = androidInfo.id;
+      } else if (Platform.isIOS) {
+        final iosInfo = await _deviceInfo.iosInfo;
+        _deviceId = iosInfo.identifierForVendor;
+      }
+    } catch (e) {
+      debugPrint("無法獲取設備資訊: $e");
+      _deviceId = "unknown_device"; 
+    }
+    
+    return _deviceId ?? "unknown_device";
+  }
+
   Future<dynamic> post(String endpoint, Map<String, dynamic> data) async {
     final Uri url = Uri.parse('$baseUrl$endpoint');
+    
+    _token = _token ?? await SecurityStorageService().readData("token");
+    await _getDeviceId();
+
+    final Map<String, dynamic> finalData = {
+      ...data,
+      "deviceId": _deviceId
+    };
     
     try {
       final http.Response response = await _httpClient.post(
@@ -68,8 +104,9 @@ class BaseApi {
         headers: {
           'Content-Type': 'application/json; charset=UTF-8',
           'Accept': 'application/json',
+          if (_token != null) 'Authorization': 'Bearer $_token'
         },
-        body: jsonEncode(data),
+        body: jsonEncode(finalData),
       ).timeout(Duration(seconds: GlobalConstants.TIMEOUT_DURATION_SECONDS));
       
       return _handleResponse(response);

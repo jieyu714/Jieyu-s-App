@@ -6,7 +6,7 @@ import 'package:jieyu_app/pages/Otp/Index.dart';
 import 'package:jieyu_app/pages/Registration/Index.dart';
 import 'package:jieyu_app/pages/Task/Index.dart';
 
-Widget getRootWidget() {
+Future<Widget> getRootWidget() async {
   const Color themeColor = Colors.lightBlueAccent;
 
   return MaterialApp(

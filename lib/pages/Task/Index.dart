@@ -53,7 +53,7 @@ class _TaskPageState extends State<TaskPage> {
 
     showDialog(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) {
         return AlertDialog(
           scrollable: true,
           title: Center(
@@ -72,7 +72,7 @@ class _TaskPageState extends State<TaskPage> {
                 controller: titleController,
                 isRequird: true,
                 textInputAction: TextInputAction.next,
-                onSubmitted: () => FocusScope.of(context).requestFocus(detailFocus),
+                onSubmitted: () => FocusScope.of(dialogContext).requestFocus(detailFocus),
               ),
               SizedBox(height: 10),
               CustomTextField(
@@ -88,7 +88,7 @@ class _TaskPageState extends State<TaskPage> {
                 controller: startTimeController,
                 readOnly: true,
                 onTap: () async {
-                  final result = await DateTimePicker().selectDateTime(context, initialDate: selectedStartTime);
+                  final result = await DateTimePicker().selectDateTime(dialogContext, initialDate: selectedStartTime);
                   if (result != null) {
                     selectedStartTime = result;
                     startTimeController.text = result.toString().substring(0, 16);
@@ -101,7 +101,7 @@ class _TaskPageState extends State<TaskPage> {
                 controller: deadTimeController,
                 readOnly: true,
                 onTap: () async {
-                  final result = await DateTimePicker().selectDateTime(context, initialDate: selectedDeadTime);
+                  final result = await DateTimePicker().selectDateTime(dialogContext, initialDate: selectedDeadTime);
                   if (result != null) {
                     selectedDeadTime = result;
                     deadTimeController.text = result.toString().substring(0, 16);
@@ -115,7 +115,7 @@ class _TaskPageState extends State<TaskPage> {
                   controller: completedTimeController,
                   readOnly: true,
                   onTap: () async {
-                    final result = await DateTimePicker().selectDateTime(context, initialDate: selectedCompletedTime);
+                    final result = await DateTimePicker().selectDateTime(dialogContext, initialDate: selectedCompletedTime);
                     if (result != null) {
                       selectedCompletedTime = result;
                       completedTimeController.text = result.toString().substring(0, 16);
@@ -128,7 +128,7 @@ class _TaskPageState extends State<TaskPage> {
           actions: [
             if (task != null) ElevatedButton(
               onPressed: () {
-                Navigator.pop(context);
+                Navigator.pop(dialogContext);
                 _deleteTask(task.id);
               },
               child: Text(
@@ -142,7 +142,7 @@ class _TaskPageState extends State<TaskPage> {
               )
             ),
             TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.pop(dialogContext),
               child: Text(
                 "取消",
                 style: TextStyle(
@@ -162,7 +162,7 @@ class _TaskPageState extends State<TaskPage> {
                   return;
                 }
 
-                Navigator.pop(context);
+                Navigator.pop(dialogContext);
                 if (task == null) {
                   _addTaskItemCheck(
                     titleController.text,
@@ -188,7 +188,7 @@ class _TaskPageState extends State<TaskPage> {
                 ),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).primaryColor
+                backgroundColor: Theme.of(dialogContext).primaryColor
               )
             )
           ],
@@ -208,7 +208,6 @@ class _TaskPageState extends State<TaskPage> {
     try {
       ProgressDialog().showLoading(context, title: "新增任務中...", minDuration: 2);
       await _api.addTask(
-        username: "Jieyu",
         title: title,
         detail: detail,
         startTime: startTime,
@@ -243,7 +242,6 @@ class _TaskPageState extends State<TaskPage> {
     try {
       ProgressDialog().showLoading(context, title: "修改任務中...", minDuration: 2);
       await _api.updateTask(
-        username: "Jieyu",
         id: id,
         title: title,
         detail: detail,
@@ -273,7 +271,6 @@ class _TaskPageState extends State<TaskPage> {
     try {
       ProgressDialog().showLoading(context, title: "刪除任務中...", minDuration: 2);
       await _api.deleteTask(
-        username: "Jieyu",
         id: id
       );
 
@@ -475,7 +472,16 @@ class _TaskPageState extends State<TaskPage> {
     });
   }
 
-  Future<void> _fetchTask() async {
+  Future<void> _fetchTask({bool isInitialization = false}) async {
+    final int loadingDialogDuration = 2;
+    if (isInitialization) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        ProgressDialog().showLoading(context, minDuration: loadingDialogDuration);
+      });
+    } else {
+      ProgressDialog().showLoading(context, minDuration: loadingDialogDuration);
+    }
+
     try {
       final response = await _api.getTask(username: "Jieyu");
       
@@ -491,6 +497,10 @@ class _TaskPageState extends State<TaskPage> {
     } catch (e) {
       if (!mounted) return;
       ProgressDialog().showResult(context, message: "無法載入任務", isError: true);
+    } finally {
+      if (mounted) {
+        ProgressDialog().hide(context);
+      }
     }
   }
 
@@ -498,7 +508,7 @@ class _TaskPageState extends State<TaskPage> {
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: _currentIndex);
-    _fetchTask();
+    _fetchTask(isInitialization: true);
   }
 
   @override
