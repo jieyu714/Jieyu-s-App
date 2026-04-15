@@ -9,7 +9,7 @@ class TaskApi {
     required String username
   }) async {
     return _baseApi.request<List<TaskItem>>(
-      HttpConstants.GET_TASK_ENDPOINT,
+      HttpConstants.GET_TASK,
       {},
       (data) => (data as List).map((e) => TaskItem.fromJson(e)).toList()
     );
@@ -22,7 +22,7 @@ class TaskApi {
     DateTime? deadTime
   }) async {
     return _baseApi.request<Map<String, dynamic>>(
-      HttpConstants.ADD_TASK_ENDPOINT,
+      HttpConstants.ADD_TASK,
       {
         "title": title,
         "detail": detail,
@@ -42,7 +42,7 @@ class TaskApi {
     required DateTime? completedAt
   }) async {
     return _baseApi.request<Map<String, dynamic>>(
-      HttpConstants.UPDATE_TASK_ENDPOINT,
+      HttpConstants.UPDATE_TASK,
       {
         "id": id,
         "title": title,
@@ -59,7 +59,7 @@ class TaskApi {
     required int id
   }) async {
     return _baseApi.request<Map<String, dynamic>>(
-      HttpConstants.DELETE_TASK_ENDPOINT,
+      HttpConstants.DELETE_TASK,
       {
         "id": id
       },

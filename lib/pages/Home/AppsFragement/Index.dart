@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:jieyu_app/utils/ProgressDialog.dart';
-import 'package:jieyu_app/viewmodels/HomeFragement.dart';
 
 class AppsFragement extends StatefulWidget {
   const AppsFragement({super.key});
@@ -11,22 +10,22 @@ class AppsFragement extends StatefulWidget {
 
 class _AppsFragementState extends State<AppsFragement> {
 
-  final List<App> _apps = [
-    App(name: "出勤與薪資", icon: Icons.attach_money),
-    App(name: "英文單字", icon: Icons.sort_by_alpha),
-    App(name: "鬧鐘", icon: Icons.alarm),
-    App(name: "課程與學分", icon: Icons.school),
-    App(name: "地點", icon: Icons.location_on, page: "/location"),
-    App(name: "天氣", icon: Icons.cloud),
-    App(name: "發票", icon: Icons.receipt_long),
-    App(name: "穿衣搭配", icon: Icons.checkroom),
-    App(name: "行程規劃", icon: Icons.event),
-    App(name: "SOP紀錄", icon: Icons.description),
-    App(name: "待辦清單", icon: Icons.check_box, page: "/task"),
-    App(name: "心情紀錄", icon: Icons.mood),
-    App(name: "記帳", icon: Icons.account_balance),
-    App(name: "飲食紀錄", icon: Icons.restaurant),
-    App(name: "欠還款紀錄", icon: Icons.splitscreen),
+  final List<List> _apps = [
+    ["出勤與薪資", Icons.attach_money],
+    ["英文單字", Icons.sort_by_alpha],
+    ["鬧鐘", Icons.alarm],
+    ["課程與學分", Icons.school],
+    ["地點", Icons.location_on, "/location"],
+    ["天氣", Icons.cloud],
+    ["發票", Icons.receipt_long],
+    ["穿衣搭配", Icons.checkroom],
+    ["行程規劃", Icons.event],
+    ["SOP紀錄", Icons.description],
+    ["待辦清單", Icons.check_box, "/task"],
+    ["心情紀錄", Icons.mood],
+    ["記帳", Icons.account_balance],
+    ["飲食紀錄", Icons.restaurant],
+    ["欠還款紀錄", Icons.splitscreen],
   ];
 
   @override
@@ -38,15 +37,15 @@ class _AppsFragementState extends State<AppsFragement> {
           final app = _apps[index];
           return TextButton(
             onPressed: () {
-              if (app.page != null) {
-                Navigator.pushNamed(context, app.page!);
+              if (app.length > 2 && app[2]!= null) {
+                Navigator.pushNamed(context, app[2]);
               } else {
-                ProgressDialog().showResult(context, message: "${app.name} 功能尚未開發", isInfo: true);
+                ProgressDialog().showResult(context, message: "${app[0]} 功能尚未開發", isInfo: true);
               }
             },
             child: ListTile(
-              leading: Icon(app.icon as IconData),
-              title: Text(app.name!, style: TextStyle(color: app.page != null ? Theme.of(context).colorScheme.primary : Colors.grey)),
+              leading: Icon(app[1] as IconData),
+              title: Text(app[0]!, style: TextStyle(color: app.length > 2 &&app[2] != null ? Theme.of(context).colorScheme.primary : Colors.grey)),
             ),
           );
         },

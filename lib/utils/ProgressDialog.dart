@@ -184,6 +184,77 @@ class ProgressDialog {
     return true;
   }
 
+  Future<bool> showConfirm(
+    BuildContext context, {
+    required String title,
+    required String body,
+    String confirmText = "確認",
+    String cancelText = "取消",
+  }) async {
+    if (_isShowing) await hide(context);
+
+    _setInfo(true, null, 0);
+
+    if (!context.mounted) return false;
+
+    final bool? result = await showDialog<bool>(
+      context: context,
+      useRootNavigator: true,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          child: Padding(
+            padding: EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 15),
+                Text(
+                  body,
+                  style: TextStyle(fontSize: 16),
+                ),
+                SizedBox(height: 25),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        _isShowing = false;
+                        Navigator.of(dialogContext).pop(false);
+                      },
+                      child: Text(cancelText, style: TextStyle(color: Colors.grey)),
+                    ),
+                    SizedBox(width: 10),
+                    ElevatedButton(
+                      onPressed: () {
+                        _isShowing = false;
+                        Navigator.of(dialogContext).pop(true);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).primaryColor,
+                        foregroundColor: Colors.white,
+                      ),
+                      child: Text(confirmText),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    _isShowing = false;
+    return result ?? false;
+  }
+
   Widget _buildResultHeader(IconData icon, Color color, String title) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,

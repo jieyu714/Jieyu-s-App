@@ -4,7 +4,6 @@ import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:jieyu_app/constants/Index.dart';
 import 'package:jieyu_app/utils/SecurityStorageService.dart';
@@ -30,23 +29,31 @@ class ApiResponse<T> implements Exception {
   String getdata() => data.toString();
 
   factory ApiResponse.fromResponse(int httpCode, dynamic body, T Function(dynamic)? fromJsonT) {
-    String apiStatus = "error";
+    String apiStatus = (httpCode >= 200 && httpCode < 300) ? "success" : "error";
     String apiMessage = "發生錯誤 ($httpCode)";
     T? apiData;
-
+    debugPrint(body.toString());
     try {
-      final decoded = (body is String && body.isNotEmpty) ? jsonDecode(body) : body;
+      final dynamic decoded = (body is String && body.isNotEmpty) ? jsonDecode(body) : body;
 
       if (decoded is Map) {
-        final map = decoded.containsKey('detail') ? decoded['detail'] : decoded;
+        final Map<String, dynamic> map = decoded.containsKey('detail') 
+            ? (decoded['detail'] is Map ? decoded['detail'] : {'message': decoded['detail'].toString()})
+            : Map<String, dynamic>.from(decoded);
         
-        if (map is Map) {
-          apiStatus = map['status']?.toString() ?? (httpCode >= 200 && httpCode < 300 ? "success" : "error");
-          apiMessage = map['message']?.toString() ?? apiMessage;
-          apiData = (map['data'] != null && fromJsonT != null) ? fromJsonT(map['data']) : map['data'];
+        apiStatus = map['status']?.toString() ?? apiStatus;
+        apiMessage = map['message']?.toString() ?? map['detail']?.toString() ?? apiMessage;
+        
+        if (map['data'] != null && fromJsonT != null) {
+          apiData = fromJsonT(map['data']);
+        } else {
+          apiData = map['data'] as T?;
         }
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint("【解析異常】: $e \n原始內容: $body");
+      apiMessage = "資料解析失敗";
+    }
     
     return ApiResponse<T>(
       statusCode: httpCode,
@@ -90,7 +97,7 @@ class BaseApi {
   Future<dynamic> post(String endpoint, Map<String, dynamic> data) async {
     final Uri url = Uri.parse('$baseUrl$endpoint');
     
-    _token = _token ?? await SecurityStorageService().readData("token");
+    _token = _token ?? await SecurityStorageService().readData(SecurityStorageServiceConstant.TOKEN);
     await _getDeviceId();
 
     final Map<String, dynamic> finalData = {
@@ -123,46 +130,36 @@ class BaseApi {
   }
 
   Future<ApiResponse<T>> request<T>(
-  String endpoint, 
-  Map<String, dynamic> data, 
-  T Function(dynamic)? fromJsonT
-) async {
-  try {
-    final responseBody = await post(endpoint, data);
+    String endpoint, 
+    Map<String, dynamic> data, 
+    T Function(dynamic)? fromJsonT
+  ) async {
+    try {
+      final responseBody = await post(endpoint, data);
 
-    final response = ApiResponse<T>.fromResponse(
-      200, 
-      responseBody, 
-      fromJsonT
-    );
-    
-    if (!response.isSuccess) {
-      throw response;
+      return ApiResponse<T>.fromResponse(200, responseBody, fromJsonT);
+    } on ApiResponse {
+      rethrow;
+    } catch (e) {
+      throw ApiResponse(
+        status: "error",
+        message: "系統處理異常: $e",
+        statusCode: 500,
+      );
     }
-    
-    return response;
-  } on ApiResponse {
-    rethrow;
-  } catch (e) {
-    throw ApiResponse(
-      status: "error",
-      message: "系統處理異常: $e",
-      statusCode: 500,
-    );
   }
-}
 
   dynamic _handleResponse(http.Response response) {
-  final result = ApiResponse<dynamic>.fromResponse(
-    response.statusCode, 
-    response.body, 
-    null
-  );
+    final result = ApiResponse<dynamic>.fromResponse(
+      response.statusCode, 
+      response.body, 
+      null
+    );
 
-  if (result.isSuccess) {
-    return response.body; 
-  } else {
-    throw result; 
+    if (result.isSuccess) {
+      return response.body; 
+    } else {
+      throw result; 
+    }
   }
-}
 }

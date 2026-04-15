@@ -14,6 +14,7 @@ class CustomTextField extends StatefulWidget {
   final Function? onTap;
   final TextInputAction textInputAction;
   final bool isRequird;
+  final IconData? icon;
 
   const CustomTextField({
     super.key,
@@ -28,7 +29,8 @@ class CustomTextField extends StatefulWidget {
     this.readOnly = false,
     this.onTap,
     this.textInputAction = TextInputAction.done,
-    this.isRequird = false
+    this.isRequird = false,
+    this.icon,
   });
 
   @override
@@ -47,6 +49,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         TextField(
@@ -72,6 +75,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     ]
                   )
               ) : Text(widget.labelText),
+            prefixIcon: widget.icon != null ? Icon(widget.icon) : null,
             floatingLabelStyle: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,

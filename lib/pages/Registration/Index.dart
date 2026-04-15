@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jieyu_app/api/AuthApi.dart';
 import 'package:jieyu_app/api/BaseApi.dart';
+import 'package:jieyu_app/constants/Index.dart';
 import 'package:jieyu_app/utils/CustomCheckBox.dart';
 import 'package:jieyu_app/utils/CustomTextField.dart';
 import 'package:jieyu_app/utils/PasswordHelper.dart';
@@ -26,10 +27,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   final AuthApi _api = AuthApi();
 
-  final RegExp _usernameRegex = RegExp(r"^[a-zA-Z][a-zA-Z0-9_]{4,20}$");
-  final RegExp _passwordRegex = RegExp(r"^[a-zA-Z0-9!@?_]{8,}$");
-  final RegExp _emailRegex = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
-
   @override
   void dispose() {
     _usernameController.dispose();
@@ -47,7 +44,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     if (_emailController.text.isEmpty || _usernameController.text.isEmpty || _passwordController.text.isEmpty || _confirmPasswordController.text.isEmpty) {
       ProgressDialog().showResult(context, message: "請填寫所有欄位", isError: true);
       return;
-    } else if (!_emailRegex.hasMatch(_emailController.text)) {
+    } else if (!RegExp(RegexConstant.EMAIL).hasMatch(_emailController.text)) {
       ProgressDialog().showResult(context, message: "請輸入正確的電子信箱");
       return;
     } else if (_usernameController.text.length < 5 || _usernameController.text.length > 20) {
@@ -56,7 +53,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     } else if (!_usernameController.text.startsWith(RegExp(r'[A-Z]'))) {
       ProgressDialog().showResult(context, message: "使用者名稱必須以大寫字母開頭", isError: true);
       return;
-    } else if (!_usernameRegex.hasMatch(_usernameController.text)) {
+    } else if (!RegExp(RegexConstant.USERNAME).hasMatch(_usernameController.text)) {
       ProgressDialog().showResult(context, message: "使用者名稱出現不允許的字符", isError: true);
       return;
     } else if (_passwordController.text.length < 8) {
@@ -65,7 +62,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     } else if (_passwordController.text != _confirmPasswordController.text) {
       ProgressDialog().showResult(context, message: "密碼與確認密碼不符", isError: true);
       return;
-    } else if (!_passwordRegex.hasMatch(_passwordController.text)) {
+    } else if (!RegExp(RegexConstant.PASSWORD).hasMatch(_passwordController.text)) {
       ProgressDialog().showResult(context, message: "密碼出現不允許的字符", isError: true);
       return;
     } else if (!_checkboxController.isChecked) {

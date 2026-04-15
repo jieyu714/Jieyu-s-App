@@ -37,7 +37,7 @@ class DateTimePicker {
     final DateTime? date = await selectDate(context, initialDate: initialDate);
     if (date == null) return null;
 
-    if (!context.mounted) return date;
+    if (!context.mounted) return null;
     final TimeOfDay? time = await selectTime(context, initialTime: TimeOfDay.fromDateTime(initialDate ?? DateTime.now()));
     if (time == null) return date;
 

@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jieyu_app/api/AuthApi.dart';
 import 'package:jieyu_app/api/BaseApi.dart';
+import 'package:jieyu_app/constants/Index.dart';
 import 'package:jieyu_app/utils/AppVersion.dart';
 import 'package:jieyu_app/utils/CustomCheckBox.dart';
 import 'package:jieyu_app/utils/CustomTextField.dart';
 import 'package:jieyu_app/utils/PasswordHelper.dart';
 import 'package:jieyu_app/utils/ProgressDialog.dart';
 import 'package:jieyu_app/utils/SecurityStorageService.dart';
+import 'package:jieyu_app/utils/SharedPreference.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -45,7 +46,11 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _checkToken() async {
-    if (!(await SecurityStorageService().hasData("token")) || !mounted) return;
+    if (!(await PreferenceService().getData(SharedPreferenceConstant.REMEMBER_ME) ?? false)) {
+      await SecurityStorageService().clearAll();
+      return;
+    }
+    if (!(await SecurityStorageService().hasData(SecurityStorageServiceConstant.TOKEN)) || !mounted) return;
 
     await ProgressDialog().showLoading(context, title: "驗證登入資訊中...", minDuration: 2);
     
@@ -103,7 +108,7 @@ class _LoginPageState extends State<LoginPage> {
     } else {
       try {
         await _api.login(_usernameController.text, PasswordHelper().hashPassword(_passwordController.text));
-        
+        PreferenceService().saveData(SharedPreferenceConstant.REMEMBER_ME, _rememberMeController);
         if (!mounted) return;
         ProgressDialog().showResult(
           context,
