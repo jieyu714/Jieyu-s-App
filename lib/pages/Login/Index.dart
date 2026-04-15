@@ -64,6 +64,10 @@ class _LoginPageState extends State<LoginPage> {
           onClose: () => Navigator.of(context).pushReplacementNamed("/home")
         );
       }
+    } on ApiResponse catch (e) {
+      await SecurityStorageService().clearAll();
+      if (!mounted) return;
+      ProgressDialog().showResult(context, message: e.message, isError: true);
     } catch (e) {
       if (!mounted) return;
       ProgressDialog().hide(context);
@@ -108,7 +112,7 @@ class _LoginPageState extends State<LoginPage> {
     } else {
       try {
         await _api.login(_usernameController.text, PasswordHelper().hashPassword(_passwordController.text));
-        PreferenceService().saveData(SharedPreferenceConstant.REMEMBER_ME, _rememberMeController);
+        PreferenceService().saveData(SharedPreferenceConstant.REMEMBER_ME, _rememberMeController.isChecked);
         if (!mounted) return;
         ProgressDialog().showResult(
           context,

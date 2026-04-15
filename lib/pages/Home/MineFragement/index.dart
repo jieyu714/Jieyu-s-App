@@ -143,7 +143,7 @@ class _MineFragementState extends State<MineFragement> {
                   _buildMenuItem(Icons.settings_outlined, "設置", function: () => Navigator.of(context).pushNamed("/settings")),
                   _buildMenuItem(Icons.help_outline, "幫助與回饋"),
                   _buildMenuItem(Icons.logout, "登出帳號", textColor: Colors.redAccent, function: () async {
-                    if (!(await ProgressDialog().showConfirm(context, title: "確認", body: "確認要登出嗎？"))) return;
+                    if (!(await ProgressDialog().showConfirm(context, title: "登出確認", body: "確認要登出嗎？"))) return;
                     if (!mounted) return;
                     await AuthApi().logout(context);
                     if (!mounted) return;
