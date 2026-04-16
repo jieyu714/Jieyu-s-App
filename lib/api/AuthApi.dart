@@ -22,7 +22,7 @@ class AuthApi {
         "passwordHash": passwordHash,
         "salt": salt
       },
-      (data) => data as Map<String, dynamic>
+      null
     );
   }
 
@@ -34,7 +34,7 @@ class AuthApi {
       {
         "email": email
       },
-      (data) => data as Map<String, dynamic>
+      null
     );
   }
 
@@ -48,7 +48,7 @@ class AuthApi {
         "email": email,
         "otp": otp
       },
-      (data) => data as Map<String, dynamic>
+      null
     );
   }
 
@@ -59,7 +59,7 @@ class AuthApi {
         "username": username,
         "passwordHash": passwordHash
       },
-      (data) => data as Map<String, dynamic>
+      null
     );
     
     if (result.isSuccess && result.data != null) {
@@ -78,18 +78,14 @@ class AuthApi {
   }
 
   Future<bool> verifyToken() async {
-    return (await _baseApi.request<Map<String, dynamic>>(
-      HttpConstants.VERIFY_TOKEN,
-      {},
-      (data) => data as Map<String, dynamic>
-    )).isSuccess;
+    return (await _baseApi.request<Map<String, dynamic>>(HttpConstants.VERIFY_TOKEN, {}, null)).isSuccess;
   }
 
   Future<ApiResponse<Map<String, dynamic>>> getUserInfo() async {
     return _baseApi.request<Map<String, dynamic>>(
       HttpConstants.GET_USER_INFO,
       {},
-      (data) => data as Map<String, dynamic>
+      null
     );
   }
 
@@ -109,7 +105,7 @@ class AuthApi {
         "phone": phone,
         "address": address
       },
-      (data) => data as Map<String, dynamic>
+      null
     );
   }
 
@@ -125,7 +121,7 @@ class AuthApi {
         "newPassword": newPassword,
         "newPasswordHash": newPasswordHash
       },
-      (data) => data as Map<String, dynamic>
+      null
     );
   }
 
@@ -134,7 +130,7 @@ class AuthApi {
       await _baseApi.request(
         HttpConstants.LOGOUT, 
         {}, 
-        (data) => data
+        null
       );
     } finally {
       await SecurityStorageService().clearAll();

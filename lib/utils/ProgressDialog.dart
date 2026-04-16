@@ -189,7 +189,7 @@ class ProgressDialog {
     required String title,
     required String body,
     String confirmText = "確認",
-    String cancelText = "取消",
+    String cancelText = "取消"
   }) async {
     if (_isShowing) await hide(context);
 

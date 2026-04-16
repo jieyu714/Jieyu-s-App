@@ -132,7 +132,9 @@ class _ProfilePageState extends State<ProfilePage> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: Text("修改使用者名稱"),
+          title: Center(
+            child: Text("修改使用者名稱")
+          ),
           content: CustomTextField(
             labelText: "使用者名稱",
             controller: nameController,
@@ -301,10 +303,13 @@ class _ProfilePageState extends State<ProfilePage> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: Text("修改電話號碼"),
+          title: Center(
+            child: Text("修改電話號碼")
+          ),
           content: CustomTextField(
             labelText: "手機號碼",
             controller: phoneController,
+            textInputType: TextInputType.phone,
             maxLength: 10,
           ),
           actions: [
@@ -372,7 +377,9 @@ class _ProfilePageState extends State<ProfilePage> {
         return StatefulBuilder(
           builder: (builderContext, setDialogState) {
             return AlertDialog(
-              title: Text("修改聯絡地址"),
+              title: Center(
+                child: Text("修改聯絡地址")
+              ),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -401,7 +408,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     SizedBox(height: 15),
                     CustomTextField(
                       labelText: "詳細地址",
-                      controller: detailController
+                      controller: detailController,
                     ),
                   ],
                 ),

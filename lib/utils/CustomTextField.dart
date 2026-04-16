@@ -15,6 +15,7 @@ class CustomTextField extends StatefulWidget {
   final TextInputAction textInputAction;
   final bool isRequird;
   final IconData? icon;
+  final TextInputType textInputType;
 
   const CustomTextField({
     super.key,
@@ -31,6 +32,7 @@ class CustomTextField extends StatefulWidget {
     this.textInputAction = TextInputAction.done,
     this.isRequird = false,
     this.icon,
+    this.textInputType = TextInputType.multiline
   });
 
   @override
@@ -60,6 +62,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
           textInputAction: widget.textInputAction,
           maxLength: widget.maxLength,
           maxLines: widget.maxLines,
+          keyboardType: widget.textInputType,
           decoration: InputDecoration(
             label: widget.isRequird
               ? Text.rich(

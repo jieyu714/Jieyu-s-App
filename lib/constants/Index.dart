@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names, file_names
+
 class GlobalConstants {
   static const String API_BASE_URL = 'https://api.jieyu.org';
   static const String APP_NAME = 'Jieyu App';
@@ -20,6 +22,15 @@ class HttpConstants {
   static const String ADD_TASK = '/task/addTask';
   static const String UPDATE_TASK = '/task/updateTask';
   static const String DELETE_TASK = '/task/deleteTask';
+
+  static const String GET_CONTACTS = '/debt/getContacts';
+  static const String ADD_CONTACT = '/debt/addContact';
+  static const String UPDATE_CONTACT = '/debt/updateContact';
+  static const String DELETE_CONTACT = '/debt/deleteContact';
+  static const String GET_RECORDS = '/debt/getRecords';
+  static const String ADD_RECORD = '/debt/addRecord';
+  static const String UPDATE_RECORD = '/debt/updateRecord';
+  static const String DELETE_RECORD = '/debt/deleteRecord';
 }
 
 class RegexConstant {
@@ -39,6 +50,7 @@ class SecurityStorageServiceConstant {
   static const String BIRTHDAY = "birthday";
   static const String ADDRESS = "address";
   static const String PASSWORD = "password";
+  static const String REGISTRATION_DATE = "registrationDate";
 }
 
 class SharedPreferenceConstant {

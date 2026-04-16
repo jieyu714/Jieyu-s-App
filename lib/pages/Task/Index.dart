@@ -126,21 +126,6 @@ class _TaskPageState extends State<TaskPage> {
             ],
           ),
           actions: [
-            if (task != null) ElevatedButton(
-              onPressed: () {
-                Navigator.pop(dialogContext);
-                _deleteTask(task.id);
-              },
-              child: Text(
-                "刪除",
-                style: TextStyle(
-                  color: Colors.white,
-                ),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red
-              )
-            ),
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
               child: Text(
@@ -289,6 +274,38 @@ class _TaskPageState extends State<TaskPage> {
     }
   }
 
+  void _showActionSheet(dynamic item) {
+    showModalBottomSheet(
+      context: context,
+      builder: (dialogContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.edit, color: Colors.blue),
+              title: const Text("修改任務"),
+              onTap: () {
+                Navigator.pop(context);
+                _showTaskDialog(task: item);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete, color: Colors.red),
+              title: const Text("刪除任務"),
+              onTap: () async {
+                bool check = await ProgressDialog().showConfirm(context, title: "刪除確認", body: "確認要刪除此任務嗎？");
+                if (!dialogContext.mounted) return;
+                Navigator.pop(dialogContext);
+                if (!check) return;
+                _deleteTask(item.id);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildTaskCard(TaskItem item) {
     return Card(
       elevation: 2,
@@ -297,7 +314,7 @@ class _TaskPageState extends State<TaskPage> {
       child: InkWell(
         borderRadius: BorderRadius.circular(15),
         onTap: () {
-          _showTaskDialog(task: item);
+          _showActionSheet(item);
         },
         child: Padding(
           padding: EdgeInsets.all(4),
@@ -336,9 +353,7 @@ class _TaskPageState extends State<TaskPage> {
                     SizedBox(width: 4),
                     Expanded(
                       child: Text(
-                        (item.startTime?.toLocal().toString().substring(2, 16) .replaceAll("-", "/")?? "No Start Time")
-                        + " ~ "
-                        + (item.deadTime?.toLocal().toString().substring(2, 16) .replaceAll("-", "/")?? "No Dead Time"),
+                        "${item.startTime?.toLocal().toString().substring(2, 16) .replaceAll("-", "/")?? "No Start Time"} ~ ${item.deadTime?.toLocal().toString().substring(2, 16) .replaceAll("-", "/")?? "No Dead Time"}",
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -472,21 +487,16 @@ class _TaskPageState extends State<TaskPage> {
     });
   }
 
-  Future<void> _fetchTask({bool isInitialization = false}) async {
-    final int loadingDialogDuration = 2;
-    if (isInitialization) {
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        ProgressDialog().showLoading(context, minDuration: loadingDialogDuration);
-      });
-    } else {
-      ProgressDialog().showLoading(context, minDuration: loadingDialogDuration);
-    }
+  Future<void> _fetchTask() async {
+    ProgressDialog().showLoading(context, minDuration: 2);
 
     try {
       final response = await _api.getTask(username: "Jieyu");
       
       if (response.isSuccess) {
-        _splitTask(response.data);
+        await _splitTask(response.data);
+        if (!mounted) return;
+        ProgressDialog().hide(context);
       } else {
         if (!mounted) return;
         ProgressDialog().showResult(context, message: response.message, isError: true);
@@ -497,10 +507,6 @@ class _TaskPageState extends State<TaskPage> {
     } catch (e) {
       if (!mounted) return;
       ProgressDialog().showResult(context, message: "無法載入任務", isError: true);
-    } finally {
-      if (mounted) {
-        ProgressDialog().hide(context);
-      }
     }
   }
 
@@ -508,7 +514,7 @@ class _TaskPageState extends State<TaskPage> {
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: _currentIndex);
-    _fetchTask(isInitialization: true);
+    Future.microtask(() => _fetchTask());
   }
 
   @override
@@ -551,16 +557,12 @@ class _TaskPageState extends State<TaskPage> {
             onPressed: () {
               _showTaskDialog();
             },
-            child: Text(
-              "+",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold
-              ),
-            ),
             shape: CircleBorder(),
             backgroundColor: (Color.lerp(Theme.of(context).primaryColor.withAlpha(150), Colors.white, 0.2)),
+            child: Icon(
+              Icons.add,
+              color: Colors.white,
+            ),
           ),
         )
       ]

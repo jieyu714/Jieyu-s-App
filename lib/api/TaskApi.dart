@@ -29,7 +29,7 @@ class TaskApi {
         "startTime": startTime?.toIso8601String(),
         "deadTime": deadTime?.toIso8601String()
       },
-      (data) => data as Map<String, dynamic>
+      null
     );
   }
 
@@ -51,7 +51,7 @@ class TaskApi {
         "deadTime": deadTime?.toIso8601String(),
         "completedAt": completedAt?.toIso8601String()
       },
-      (data) => data as Map<String, dynamic>
+      null
     );
   }
 
@@ -63,7 +63,7 @@ class TaskApi {
       {
         "id": id
       },
-      (data) => data as Map<String, dynamic>
+      null
     );
   }
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jieyu_app/constants/Index.dart';
+import 'package:jieyu_app/pages/Debt/ContactsFragement/Index.dart';
+import 'package:jieyu_app/pages/Debt/Index.dart';
 import 'package:jieyu_app/pages/Home/Index.dart';
 import 'package:jieyu_app/pages/Location/Index.dart';
 import 'package:jieyu_app/pages/Login/Index.dart';
@@ -54,9 +56,14 @@ Map<String, Widget Function(BuildContext)> getRootRoutes() {
     "/otp": (context) => OtpPage(),
 
     "/home": (context) => HomePage(),
+
     "/task": (context) => TaskPage(),
+
     "/location": (context) => Location(),
+
     "/settings": (context) => SettingsPage(),
     "/profile": (context) => ProfilePage(),
+    
+    "/debt": (context) => DebtPage(),
   };
 }

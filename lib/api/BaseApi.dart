@@ -44,10 +44,17 @@ class ApiResponse<T> implements Exception {
         apiStatus = map['status']?.toString() ?? apiStatus;
         apiMessage = map['message']?.toString() ?? map['detail']?.toString() ?? apiMessage;
         
-        if (map['data'] != null && fromJsonT != null) {
-          apiData = fromJsonT(map['data']);
-        } else {
-          apiData = map['data'] as T?;
+        if (map['data'] != null) {
+          if (fromJsonT != null) {
+            apiData = fromJsonT(map['data']);
+          } else {
+            final dynamic rawData = map['data'];
+            try {
+              apiData = rawData as T?;
+            } catch (_) {
+              apiData = rawData; 
+            }
+          }
         }
       }
     } catch (e) {
@@ -105,28 +112,15 @@ class BaseApi {
       "deviceId": _deviceId
     };
     
-    try {
-      final http.Response response = await _httpClient.post(
-        url,
-        headers: {
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Accept': 'application/json',
-          if (_token != null) 'Authorization': 'Bearer $_token'
-        },
-        body: jsonEncode(finalData),
-      ).timeout(Duration(seconds: GlobalConstants.TIMEOUT_DURATION_SECONDS));
-      
-      return _handleResponse(response);
-    } on SocketException {
-      throw ApiResponse(message: "無法連線至伺服器，請檢查網路設定", statusCode: 0);
-    } on TimeoutException {
-      throw ApiResponse(message: "伺服器忙碌中，請稍後再試", statusCode: 408);
-    } on http.ClientException {
-      throw ApiResponse(message: "網路異常，請稍後再試", statusCode: 0);
-    } catch (e) {
-      if (e is ApiResponse) rethrow;
-      throw ApiResponse(message: "系統邊界錯誤：$e", statusCode: 500);
-    }
+    return await _httpClient.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Accept': 'application/json',
+        if (_token != null) 'Authorization': 'Bearer $_token'
+      },
+      body: jsonEncode(finalData),
+    ).timeout(Duration(seconds: GlobalConstants.TIMEOUT_DURATION_SECONDS));
   }
 
   Future<ApiResponse<T>> request<T>(
@@ -135,17 +129,20 @@ class BaseApi {
     T Function(dynamic)? fromJsonT
   ) async {
     try {
-      final responseBody = await post(endpoint, data);
+      final response = await post(endpoint, data);
 
-      return ApiResponse<T>.fromResponse(200, responseBody, fromJsonT);
+      final String responseBody = _handleResponse(response);
+
+      return ApiResponse<T>.fromResponse(response.statusCode, responseBody, fromJsonT);
+    } on SocketException {
+      throw ApiResponse(message: "無法連線至伺服器", statusCode: 0);
+    } on TimeoutException {
+      throw ApiResponse(message: "連線逾時", statusCode: 408);
     } on ApiResponse {
       rethrow;
     } catch (e) {
-      throw ApiResponse(
-        status: "error",
-        message: "系統處理異常: $e",
-        statusCode: 500,
-      );
+      debugPrint("系統邊界錯誤：$e");
+      throw ApiResponse(message: "系統邊界錯誤：$e", statusCode: 500);
     }
   }
 

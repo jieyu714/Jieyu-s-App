@@ -12,8 +12,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
-  List<String> _navigationItems = ["首頁", "應用", "我的"];
-  List<IconData> _navigationIcons = [Icons.home, Icons.apps, Icons.person];
+  final List<String> _navigationItems = ["首頁", "應用", "我的"];
+  final List<IconData> _navigationIcons = [Icons.home, Icons.apps, Icons.person];
   int _currentIndex = 0;
 
   late PageController _pageController;
