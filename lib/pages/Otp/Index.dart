@@ -38,7 +38,7 @@ class _OtpPageState extends State<OtpPage> {
 
   void _startCountdown() {
     setState(() {
-      _countdownTime = 1;
+      _countdownTime = 60;
       _isButtonDisabled = true;
     });
 

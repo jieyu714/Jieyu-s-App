@@ -14,11 +14,14 @@ class RecordsFragement extends StatefulWidget {
   State<RecordsFragement> createState() => _RecordsFragementState();
 }
 
-class _RecordsFragementState extends State<RecordsFragement> {
+class _RecordsFragementState extends State<RecordsFragement> with AutomaticKeepAliveClientMixin {
   List<dynamic> _contacts = []; 
   List<dynamic> _records = [];
 
   final DebtApi _api = DebtApi();
+
+  @override
+  bool get wantKeepAlive => true;
   
   void _fetchData() async {
     await ProgressDialog().showLoading(context, minDuration: 2);
@@ -184,14 +187,17 @@ class _RecordsFragementState extends State<RecordsFragement> {
                       ProgressDialog().showResult(context, message: "請填寫所有必填欄位", isError: true);
                       return;
                     } else if (!RegExp(r"^\d+$").hasMatch(amountController.text)) {
-                      debugPrint("輸入錯誤");
+                      ProgressDialog().showResult(context, message: "金額輸入錯誤", isError: true);
+                      return;
+                    } else if (settlementDateController.text.isNotEmpty ^ paymentMethodController.text.isNotEmpty) {
+                      ProgressDialog().showResult(context, message: "請填寫完整的結清資訊", isError: true);
                       return;
                     }
 
                     Navigator.pop(dialogContext);
                     if (!mounted) return;
                     ProgressDialog().showLoading(context, title: "${record == null ? "新增" : "更改"}中...", minDuration: 2);
-
+                    debugPrint("開始${record == null ? "新增" : "修改"}紀錄：settledDate=${settlementDate.toString()}");
                     try {
                       if (record == null) {
                         await _api.addRecord(
@@ -206,7 +212,6 @@ class _RecordsFragementState extends State<RecordsFragement> {
                           settlementDate: settlementDate,
                         );
                       } else {
-                        debugPrint("更新紀錄：id=${record.id}, contactId=$selectedContactId, transactionDate=${transactionDate.toString()}, type=$selectedType, item=${itemController.text}, amount=${amountController.text}, currency=$selectedCurrency, description=${descController.text}, paymentMethod=${paymentMethodController.text}, settlementDate=${settlementDate.toString()}");
                         await _api.updateRecord(
                           id: record.id!,
                           contactId: int.parse(selectedContactId!),
@@ -360,6 +365,8 @@ class _RecordsFragementState extends State<RecordsFragement> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+
     return Stack(
       children: [
         RefreshIndicator(

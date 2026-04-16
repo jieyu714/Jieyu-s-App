@@ -231,9 +231,12 @@ class ContactDetailScreen extends StatefulWidget {
   State<ContactDetailScreen> createState() => _ContactDetailScreenState();
 }
 
-class _ContactDetailScreenState extends State<ContactDetailScreen> {
+class _ContactDetailScreenState extends State<ContactDetailScreen> with AutomaticKeepAliveClientMixin {
   List<RecordItem> _personalRecords = [];
   final DebtApi _api = DebtApi();
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -284,6 +287,8 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text("${widget.contact["name"]} 的往來明細"),

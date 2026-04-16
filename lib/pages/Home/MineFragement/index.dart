@@ -11,9 +11,12 @@ class MineFragement extends StatefulWidget {
   State<MineFragement> createState() => _MineFragementState();
 }
 
-class _MineFragementState extends State<MineFragement> {
+class _MineFragementState extends State<MineFragement> with AutomaticKeepAliveClientMixin {
   String username = "用戶";
   String userId = "";
+
+  @override
+  bool get wantKeepAlive => true;
 
   Widget _buildMenuItem(IconData icon, String title, {Color? textColor, Function? function}) {
     return ListTile(
@@ -54,6 +57,8 @@ class _MineFragementState extends State<MineFragement> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+
     return Container(
       color: Theme.of(context).primaryColor,
       child: Column(

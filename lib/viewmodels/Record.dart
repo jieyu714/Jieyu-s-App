@@ -34,7 +34,7 @@ class RecordItem {
       amount: json["amount"],
       currency: json["currency"],
       paymentMethod: json["paymentMethod"],
-      settlementDate: json["transactionDate"] != null ? DateTime.parse(json["transactionDate"]) : null
+      settlementDate: json["settlementDate"] != null ? DateTime.parse(json["settlementDate"]) : null
     );
   }
 }

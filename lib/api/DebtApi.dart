@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:jieyu_app/api/BaseApi.dart';
 import 'package:jieyu_app/constants/Index.dart';
 import 'package:jieyu_app/viewmodels/Record.dart';
@@ -99,6 +100,7 @@ class DebtApi {
     required String paymentMethod,
     DateTime? settlementDate
   }) async {
+    debugPrint("紀錄：${settlementDate?.toIso8601String().split('T')[0]}");
     return _baseApi.request<Map<String, dynamic>>(
       HttpConstants.UPDATE_RECORD,
       {

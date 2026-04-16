@@ -547,8 +547,11 @@ class _TaskPageState extends State<TaskPage> {
   Widget _buildPage(int idx) {
     return Stack(
       children: [
-        ListView(
-          children: _buildList(idx),
+        RefreshIndicator(
+          onRefresh: () => _fetchTask(),
+          child: ListView(
+            children: _buildList(idx),
+          )
         ),
         Positioned(
           right: 20,
