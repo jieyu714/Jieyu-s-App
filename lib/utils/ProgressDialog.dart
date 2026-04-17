@@ -23,7 +23,7 @@ class _AnimatedEllipsisTextState extends State<_AnimatedEllipsisText> {
     _baseText = _shoudAnimate ? widget.text.substring(0, widget.text.length - 3) : widget.text;
 
     if (_shoudAnimate) {
-      _timer = Timer.periodic(Duration(milliseconds: 500), (timer) {
+      _timer = Timer.periodic(Duration(milliseconds: 150), (timer) {
         if (mounted) {
           setState(() {
             _dotCount = (_dotCount + 1) % 4;

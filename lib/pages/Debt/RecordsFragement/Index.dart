@@ -326,11 +326,18 @@ class _RecordsFragementState extends State<RecordsFragement> with AutomaticKeepA
         return Card(
           margin: EdgeInsets.symmetric(vertical: 6),
           child: ListTile(
-            title: Text(
-              "${record.item} (${contact['name']})",
-              style: TextStyle(
-                fontWeight: FontWeight.bold
-              ),
+            title: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (record.settlementDate != null)
+                  Icon(Icons.check_circle, color: Colors.blue, size: 16),
+                Text(
+                  "${record.item} (${contact['name']})",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold
+                  ),
+                ),
+              ]
             ),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -340,21 +347,13 @@ class _RecordsFragementState extends State<RecordsFragement> with AutomaticKeepA
                   Text("備註: ${record.description}", maxLines: 1, overflow: TextOverflow.ellipsis),
               ],
             ),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  "${isLend ? '+' : '-'}${record.amount} ${record.currency}",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: isLend ? Colors.green : Colors.red,
-                  ),
-                ),
-                if (record.settlementDate != null)
-                  Icon(Icons.check_circle, color: Colors.blue, size: 16),
-              ],
+            trailing: Text(
+              "${isLend ? '+' : '-'}${record.amount} ${record.currency}",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                color: isLend ? Colors.green : Colors.red,
+              ),
             ),
             onTap: () => _showActionSheet(record),
           ),

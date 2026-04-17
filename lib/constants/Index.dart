@@ -31,6 +31,11 @@ class HttpConstants {
   static const String ADD_RECORD = '/debt/addRecord';
   static const String UPDATE_RECORD = '/debt/updateRecord';
   static const String DELETE_RECORD = '/debt/deleteRecord';
+
+  static const String GET_INVOICES = '/invoice/getInvoices';
+  static const String ADD_INVOICE = '/invoice/addInvoice';
+  static const String UPDATE_INVOICE = '/invoice/updateInvoice';
+  static const String DELETE_INVOICE = '/invoice/deleteInvoice';
 }
 
 class RegexConstant {

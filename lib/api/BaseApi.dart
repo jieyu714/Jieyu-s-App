@@ -135,14 +135,14 @@ class BaseApi {
 
       return ApiResponse<T>.fromResponse(response.statusCode, responseBody, fromJsonT);
     } on SocketException {
-      throw ApiResponse(message: "無法連線至伺服器", statusCode: 0);
+      throw ApiResponse(message: "無法連線至伺服器，請稍後再試", statusCode: 0);
     } on TimeoutException {
-      throw ApiResponse(message: "連線逾時", statusCode: 408);
+      throw ApiResponse(message: "連線逾時，請檢查網路連線", statusCode: 408);
     } on ApiResponse {
       rethrow;
     } catch (e) {
       debugPrint("系統邊界錯誤：$e");
-      throw ApiResponse(message: "系統邊界錯誤：$e", statusCode: 500);
+      throw ApiResponse(message: "系統邊界錯誤，請聯繫管理員", statusCode: 500);
     }
   }
 

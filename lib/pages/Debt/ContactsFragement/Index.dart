@@ -80,7 +80,6 @@ class _ContactsFragementState extends State<ContactsFragement> {
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             subtitle: Text("共 ${members.length} 人"),
-            initiallyExpanded: true,
             children: members.map((contact) {
               final String name = contact['name'];
               final int balance = contact['totalBalance'];
