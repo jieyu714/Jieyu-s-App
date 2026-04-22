@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:jieyu_app/api/BaseApi.dart';
 import 'package:jieyu_app/api/InvoiceApi.dart';
 import 'package:jieyu_app/constants/Index.dart';
@@ -16,10 +17,15 @@ class WinningInvoiceFragment extends StatefulWidget {
   State<WinningInvoiceFragment> createState() => _WinningInvoiceFragmentState();
 }
 
-class _WinningInvoiceFragmentState extends State<WinningInvoiceFragment> with AutomaticKeepAliveClientMixin {
+class _WinningInvoiceFragmentState extends State<WinningInvoiceFragment> with AutomaticKeepAliveClientMixin, SingleTickerProviderStateMixin {
   String _selectedPeriod = "";
   bool _isLoading = false;
   String _permission = "user";
+  late AnimationController _animationController;
+  late Animation<double> _prizeAnimation;
+  bool _isCheckingPrize = false;
+  double _animatedPrize = 0;
+  int _finalTotalPrize = 0;
 
   @override
   bool get wantKeepAlive => true;
@@ -46,6 +52,8 @@ class _WinningInvoiceFragmentState extends State<WinningInvoiceFragment> with Au
       _userWinningNumbers = (await _api.getUserWinningNumbers()).data ?? [];
 
       Map<String, Map<String, List<String>>> tempGrouped = {};
+      String tmpPeriod = "";
+      bool isExist = false;
       for (var item in _systemWinningNumbers) {
         String period = item['period'] ?? '未知期別';
         String awardType = item['awardType'] ?? '未知獎項';
@@ -53,7 +61,8 @@ class _WinningInvoiceFragmentState extends State<WinningInvoiceFragment> with Au
         
         if (!tempGrouped.containsKey(period)) {
           tempGrouped[period] = {};
-          _selectedPeriod = max(int.parse(_selectedPeriod.isEmpty ? "0" : _selectedPeriod), int.parse(period)).toString();
+          tmpPeriod = max(int.parse(tmpPeriod.isEmpty ? "0" : tmpPeriod), int.parse(period)).toString();
+          isExist = isExist ? true : period == _selectedPeriod;
         }
         if (!tempGrouped[period]!.containsKey(awardType)) {
           tempGrouped[period]![awardType] = [];
@@ -61,10 +70,18 @@ class _WinningInvoiceFragmentState extends State<WinningInvoiceFragment> with Au
         tempGrouped[period]![awardType]!.add(number);
       }
 
+      if (!isExist) {
+        _selectedPeriod = tmpPeriod;
+      }
+
       setState(() {
         debugPrint(_groupedSystemWinningNumbers.toString());
         _groupedSystemWinningNumbers = tempGrouped;
       });
+
+      int total = _calculateTotalForPeriod(_selectedPeriod);
+
+      if (total > 0) _runPrizeDrawingAnimation(total);
 
       if (!mounted) return;
       ProgressDialog().hide(context);
@@ -80,9 +97,44 @@ class _WinningInvoiceFragmentState extends State<WinningInvoiceFragment> with Au
     setState(() => _isLoading = false);
   }
 
+  int _calculateTotalForPeriod(String period) {
+    return _userWinningNumbers.where((item) {
+      String invoicePeriod = item['period'] ?? "";
+      if (int.parse(invoicePeriod.substring(3, 5)) % 2 == 0) {
+        invoicePeriod = invoicePeriod.substring(0, 3) + (int.parse(invoicePeriod.substring(3, 5)) - 1).toString().padLeft(2, '0');
+      }
+      
+      return invoicePeriod == _selectedPeriod;
+    }).fold(0, (sum, item) => sum + (item['prizeAmount'] as int));
+  }
+
   @override
   void initState() {
     super.initState();
+
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 3)
+    );
+
+    _animationController.addListener(() {
+      setState(() {
+        if (_animationController.value < 0.9) {
+          _animatedPrize = Random().nextInt(_finalTotalPrize > 1000 ? _finalTotalPrize * 2 : 9999).toDouble();
+          if (Random().nextBool()) HapticFeedback.lightImpact();
+        } else {
+          _animatedPrize = _prizeAnimation.value;
+        }
+      });
+    });
+
+    _animationController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        setState(() => _isCheckingPrize = false);
+        HapticFeedback.vibrate();
+      }
+    });
+
     Future.microtask(() async {
       fetchWinningNumbers();
       _permission = (await SecurityStorageService().readData(SecurityStorageServiceConstant.PERMISSION))!;
@@ -90,44 +142,47 @@ class _WinningInvoiceFragmentState extends State<WinningInvoiceFragment> with Au
     });
   }
 
+  void _runPrizeDrawingAnimation(int realAmount) {
+    _finalTotalPrize = realAmount;
+    _isCheckingPrize = true;
+    debugPrint("金額 $realAmount");
+    _prizeAnimation = Tween<double>(
+      begin: Random().nextInt(9999).toDouble(), 
+      end: realAmount.toDouble()
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Interval(0.9, 1.0, curve: Curves.easeOut)
+    ));
+
+    _animationController.forward(from: 0.0);
+  }
+
   Widget _buildUserWinningCard() {
-    List<dynamic> currentPeriodWinningNumbers = _userWinningNumbers.where((item) => item['period'] == _selectedPeriod).toList();
-    if (currentPeriodWinningNumbers.isEmpty) {
-      return SizedBox.shrink();
-    }
+    List<dynamic> currentPeriodWinningNumbers = _userWinningNumbers.where((item) {
+      String invoicePeriod = item['period'] ?? "";
+      if (invoicePeriod.isNotEmpty && int.parse(invoicePeriod.substring(3, 5)) % 2 == 0) {
+        invoicePeriod = invoicePeriod.substring(0, 3) + (int.parse(invoicePeriod.substring(3, 5)) - 1).toString().padLeft(2, '0');
+      }
+      return invoicePeriod == _selectedPeriod;
+    }).toList();
 
-    int totalPrize = currentPeriodWinningNumbers.fold(0, (sum, item) => sum + (item['prizeAmount'] as int));
-
-    return TweenAnimationBuilder<double>(
-      key: ValueKey(_selectedPeriod),
-      duration: const Duration(milliseconds: 600),
-      curve: Curves.elasticOut,
-      tween: Tween(begin: 0.0, end: 1.0),
-      builder: (context, value, child) {
-        return Transform.scale(
-          scale: value,
-          child: Opacity(
-            opacity: value.clamp(0.0, 1.0),
-            child: child,
-          )
-        );
-      },
-      child: Container(
-        margin: EdgeInsets.only(bottom: 20),
+    return currentPeriodWinningNumbers.isEmpty
+      ? SizedBox.shrink()
+      : Container(
+        margin: EdgeInsets.all(16),
         padding: EdgeInsets.all(24),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              Color(0xFFFF5F6D),
-              Color(0xFFFFC371)
-            ],
+            colors: _isCheckingPrize 
+              ? [Colors.blueGrey, Colors.blue]
+              : [Color(0xFFFF5F6D), Color(0xFFFFC371)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight
           ),
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.redAccent.withValues(alpha: 0.3),
+              color: (_isCheckingPrize ? Colors.blue : Colors.redAccent).withValues(alpha: 0.3),
               blurRadius: 10,
               offset: Offset(0, 5)
             )
@@ -135,56 +190,95 @@ class _WinningInvoiceFragmentState extends State<WinningInvoiceFragment> with Au
         ),
         child: Column(
           children: [
-            Icon(Icons.stars, color: Colors.white, size: 48),
-            SizedBox(height: 12),
+            _isCheckingPrize 
+              ? SizedBox(
+                  height: 48,
+                  width: 48,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 3
+                  ),
+                )
+              : TweenAnimationBuilder(
+                  tween: Tween<double>(begin: 0, end: 1),
+                  duration:Duration(milliseconds: 500),
+                  builder: (context, double val, child) => Transform.scale(scale: 1 + (val * 0.2), child: child),
+                  child: Icon(
+                    Icons.stars,
+                    color: Colors.white,
+                    size: 48
+                  ),
+                ),
+            SizedBox(height: 16),
             Text(
-              "太幸運了！本期您中獎了",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold
-              )
+              _isCheckingPrize ? "正在核對中獎資訊..." : "恭喜！本期中獎金額",
+              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w500)
             ),
             SizedBox(height: 8),
-            Text(
-              "NT\$ ${totalPrize.toString()}",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 42,
-                fontWeight: FontWeight.bold
-              )
-            ),
-            Divider(color: Colors.white54, height: 30),
-            Column(
-              children: _userWinningNumbers.map((inv) {
-                return Padding(
-                  padding: EdgeInsets.symmetric(vertical: 4),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "${inv['number']} (${inv['prizeType']})",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500
-                        ),
-                      ),
-                      Text(
-                        "+ \$${inv['prizeAmount']}",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500
-                        ),
-                      )
-                    ]
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Text(
+                  "NT\$ ",
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 20
                   )
-                );
-              }).toList()
-            )
-          ]
-        )
-      )
-    );
+                ),
+                Text(
+                  _animatedPrize.toInt().toString(),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 52,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'monospace',
+                  ),
+                ),
+              ],
+            ),
+            AnimatedSwitcher(
+              duration: Duration(seconds: 1),
+              child: !_isCheckingPrize 
+                ? Column(
+                    children: [
+                      Divider(color: Colors.white54, height: 30),
+                      ...currentPeriodWinningNumbers.map((inv) => Padding(
+                        padding: EdgeInsets.symmetric(vertical: 4),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "${inv['number']} (${inv['prizeType']})", 
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16
+                              )
+                            ),
+                            Text(
+                              "+ \$${inv['prizeAmount']}", 
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold
+                              )
+                            ),
+                          ],
+                        ),
+                      )),
+                    ],
+                  )
+                : Padding(
+                    padding: EdgeInsets.only(top: 20),
+                    child: Text(
+                      "好運加持中...",
+                      style: TextStyle(color: Colors.white70)
+                    ),
+                  ),
+            ),
+          ],
+        ),
+      );
   }
 
   Widget _buildPrizeCard(String title, List<String> numbers, int amount, Color color) {
@@ -275,7 +369,24 @@ class _WinningInvoiceFragmentState extends State<WinningInvoiceFragment> with Au
       child: Center(
         child: DropdownButton<String>(
           value: _selectedPeriod,
-          onChanged: (val) => setState(() => _selectedPeriod = val!),
+          onChanged: (val) {
+            if (val == null || val == _selectedPeriod) return;
+            setState(() {
+              _selectedPeriod = val;
+              _finalTotalPrize = 0;
+            });
+
+            int total = _calculateTotalForPeriod(val);
+            if (total > 0) {
+              _runPrizeDrawingAnimation(total);
+            } else {
+              _animationController.stop();
+              setState(() {
+                _isCheckingPrize = false;
+                _animatedPrize = 0;
+              });
+            }
+          },
           items: [
             ...List.generate(_groupedSystemWinningNumbers.keys.length, (index) {
               String period = _groupedSystemWinningNumbers.keys.elementAt(index);
@@ -392,7 +503,13 @@ class _WinningInvoiceFragmentState extends State<WinningInvoiceFragment> with Au
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
-                        child: Text("儲存本期所有號碼", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        child: Text(
+                          "儲存本期所有號碼",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold
+                          )
+                        ),
                       ),
                     ),
                   ],
@@ -407,8 +524,8 @@ class _WinningInvoiceFragmentState extends State<WinningInvoiceFragment> with Au
 
   Future<void> _saveAllWinningNumbers(String targetPeriod, Map<String, List<TextEditingController>> controllers) async {
     try {
-      ProgressDialog().showLoading(context, message: "更新中...", minDuration: 2);
       Navigator.pop(context); 
+      ProgressDialog().showLoading(context, message: "更新中...", minDuration: 2);
 
       Map<String, List<String>> batchData = {};
       
@@ -437,9 +554,11 @@ class _WinningInvoiceFragmentState extends State<WinningInvoiceFragment> with Au
   Widget build(BuildContext context) {
     super.build(context);
 
-    return Scaffold(
-      backgroundColor: Colors.grey[50],
-      body: Stack(
+    return RefreshIndicator(
+      onRefresh: () async {
+        await fetchWinningNumbers();
+      },
+      child: Stack(
         children: [
           Column(
             children: [
@@ -493,7 +612,7 @@ class _WinningInvoiceFragmentState extends State<WinningInvoiceFragment> with Au
             )
           )
         ]
-      ),
+      )
     );
   }
 }

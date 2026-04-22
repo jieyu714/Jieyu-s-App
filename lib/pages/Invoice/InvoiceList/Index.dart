@@ -79,11 +79,11 @@ class _InvoiceListFragmentState extends State<InvoiceListFragment> with Automati
   Widget build(BuildContext context) {
     super.build(context);
 
-    return _invoices == null || _invoices!.isEmpty
-      ? Center(child: Text("尚無發票紀錄"))
-      : RefreshIndicator(
-        onRefresh: () async => _loadInvoices(),
-        child: _buildInvoiceList()
-      );
+    return RefreshIndicator(
+      onRefresh: () async => _loadInvoices(),
+      child: _invoices == null || _invoices!.isEmpty
+        ? Center(child: Text("尚無發票紀錄"))
+        : _buildInvoiceList()
+    );
   }
 }
