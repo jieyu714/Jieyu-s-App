@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:jieyu_app/pages/Invoice/InvoiceEntryFragement/Index.dart';
+import 'package:jieyu_app/pages/Invoice/InvoiceEntryFragment/Index.dart';
 import 'package:jieyu_app/pages/Invoice/InvoiceList/Index.dart';
-import 'package:jieyu_app/pages/Invoice/WinningInvoiceFragement/Index.dart';
+import 'package:jieyu_app/pages/Invoice/WinningInvoiceFragment/Index.dart';
 
 class InvoicePage extends StatefulWidget {
   const InvoicePage({super.key});
@@ -15,7 +15,7 @@ class _InvoicePageState extends State<InvoicePage> {
   final List<String> _navigationItems = ["中獎發票", "發票輸入", "發票一覽"];
   final List<IconData> _navigationIcons = [Icons.card_giftcard, Icons.edit, Icons.list];
 
-  int _currentIndex = 0;
+  int _currentIndex = 1;
   late PageController _pageController;
 
   @override
@@ -32,9 +32,9 @@ class _InvoicePageState extends State<InvoicePage> {
 
   List<Widget> _buildPages() {
     return [
-      WinningInvoiceFragement(),
-      InvoiceEntryFragement(),
-      InvoiceListFragement()
+      WinningInvoiceFragment(),
+      InvoiceEntryFragment(),
+      InvoiceListFragment()
     ];
   }
 

@@ -4,14 +4,14 @@ import 'package:jieyu_app/constants/Index.dart';
 import 'package:jieyu_app/utils/ProgressDialog.dart';
 import 'package:jieyu_app/utils/SecurityStorageService.dart';
 
-class MineFragement extends StatefulWidget {
-  const MineFragement({super.key});
+class MineFragment extends StatefulWidget {
+  const MineFragment({super.key});
 
   @override
-  State<MineFragement> createState() => _MineFragementState();
+  State<MineFragment> createState() => _MineFragmentState();
 }
 
-class _MineFragementState extends State<MineFragement> with AutomaticKeepAliveClientMixin {
+class _MineFragmentState extends State<MineFragment> with AutomaticKeepAliveClientMixin {
   String username = "用戶";
   String userId = "";
 

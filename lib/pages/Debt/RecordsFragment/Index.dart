@@ -7,14 +7,14 @@ import 'package:jieyu_app/utils/DateTimePicker.dart';
 import 'package:jieyu_app/utils/ProgressDialog.dart';
 import 'package:jieyu_app/viewmodels/Record.dart';
 
-class RecordsFragement extends StatefulWidget {
-  const RecordsFragement({super.key});
+class RecordsFragment extends StatefulWidget {
+  const RecordsFragment({super.key});
 
   @override
-  State<RecordsFragement> createState() => _RecordsFragementState();
+  State<RecordsFragment> createState() => _RecordsFragmentState();
 }
 
-class _RecordsFragementState extends State<RecordsFragement> with AutomaticKeepAliveClientMixin {
+class _RecordsFragmentState extends State<RecordsFragment> with AutomaticKeepAliveClientMixin {
   List<dynamic> _contacts = []; 
   List<dynamic> _records = [];
 

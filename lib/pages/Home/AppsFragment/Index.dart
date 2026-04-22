@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:jieyu_app/utils/ProgressDialog.dart';
 
-class AppsFragement extends StatefulWidget {
-  const AppsFragement({super.key});
+class AppsFragment extends StatefulWidget {
+  const AppsFragment({super.key});
 
   @override
-  State<AppsFragement> createState() => _AppsFragementState();
+  State<AppsFragment> createState() => _AppsFragmentState();
 }
 
-class _AppsFragementState extends State<AppsFragement> with AutomaticKeepAliveClientMixin {
+class _AppsFragmentState extends State<AppsFragment> with AutomaticKeepAliveClientMixin {
 
   @override
   bool get wantKeepAlive => true;

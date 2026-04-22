@@ -7,14 +7,14 @@ import 'package:jieyu_app/utils/ProgressDialog.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:barcode_widget/barcode_widget.dart' as bw;
 
-class InvoiceEntryFragement extends StatefulWidget {
-  InvoiceEntryFragement({super.key});
+class InvoiceEntryFragment extends StatefulWidget {
+  InvoiceEntryFragment({super.key});
 
   @override
-  State<InvoiceEntryFragement> createState() => _InvoiceEntryFragementState();
+  State<InvoiceEntryFragment> createState() => _InvoiceEntryFragmentState();
 }
 
-class _InvoiceEntryFragementState extends State<InvoiceEntryFragement> {
+class _InvoiceEntryFragmentState extends State<InvoiceEntryFragment> {
   bool _isScannerMode = false;
   
   String? _leftQrPart;
@@ -159,7 +159,7 @@ class _InvoiceEntryFragementState extends State<InvoiceEntryFragement> {
     );
   }
 
-  Map<String, dynamic>? _parseInvoiceData(String rawData) {
+  Map<String, dynamic>? _parseInvoiceData(String rawData, [String? rightPart]) {
     try {
       if (rawData.length < 77) return null;
       String number = rawData.substring(0, 10);
@@ -187,7 +187,7 @@ class _InvoiceEntryFragementState extends State<InvoiceEntryFragement> {
         "buyerTaxId": buyerTaxId,
         "sellerTaxId": sellerTaxId,
         "encryptCode": encryptCode,
-        "originalInformation": rawData,
+        "originalInformation": rawData + (rightPart ?? ""),
       };
     } catch (e) {
       debugPrint("解析錯誤: $e");
@@ -206,7 +206,7 @@ class _InvoiceEntryFragementState extends State<InvoiceEntryFragement> {
     try {
       ProgressDialog().showLoading(context, message: "儲存中...", minDuration: 2);
 
-      final data = _parseInvoiceData(_leftQrPart!);
+      final data = _parseInvoiceData(_leftQrPart!, _rightQrPart);
       
       _leftQrPart = null;
       _rightQrPart = null;

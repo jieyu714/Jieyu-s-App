@@ -32,7 +32,7 @@ class CustomTextField extends StatefulWidget {
     this.textInputAction = TextInputAction.done,
     this.isRequird = false,
     this.icon,
-    this.textInputType = TextInputType.multiline
+    this.textInputType = TextInputType.multiline,
   });
 
   @override

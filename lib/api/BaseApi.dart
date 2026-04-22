@@ -34,7 +34,14 @@ class ApiResponse<T> implements Exception {
     T? apiData;
     debugPrint(body.toString());
     try {
-      final dynamic decoded = (body is String && body.isNotEmpty) ? jsonDecode(body) : body;
+      dynamic decoded;
+    
+      if (body is String && (body.trim().startsWith('{') || body.trim().startsWith('['))) {
+        decoded = jsonDecode(body);
+      } else {
+        apiMessage = (body is String && body.isNotEmpty) ? body : "發生錯誤 ($httpCode)";
+        decoded = null;
+      }
 
       if (decoded is Map) {
         final Map<String, dynamic> map = decoded.containsKey('detail') 

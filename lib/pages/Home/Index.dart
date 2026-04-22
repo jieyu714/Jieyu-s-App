@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:jieyu_app/pages/Home/AppsFragement/Index.dart';
-import 'package:jieyu_app/pages/Home/HomeFragement/Index.dart';
-import 'package:jieyu_app/pages/Home/MineFragement/index.dart';
+import 'package:jieyu_app/pages/Home/AppsFragment/Index.dart';
+import 'package:jieyu_app/pages/Home/HomeFragment/Index.dart';
+import 'package:jieyu_app/pages/Home/MineFragment/index.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -32,9 +32,9 @@ class _HomePageState extends State<HomePage> {
 
   List<Widget> _buildPages() {
     return [
-      HomeFragement(),
-      AppsFragement(),
-      MineFragement(),
+      HomeFragment(),
+      AppsFragment(),
+      MineFragment(),
     ];
   }
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:jieyu_app/pages/Debt/ContactsFragement/Index.dart';
-import 'package:jieyu_app/pages/Debt/RecordsFragement/Index.dart';
+import 'package:jieyu_app/pages/Debt/ContactsFragment/Index.dart';
+import 'package:jieyu_app/pages/Debt/RecordsFragment/Index.dart';
 
 class DebtPage extends StatefulWidget {
   const DebtPage({super.key});
@@ -30,8 +30,8 @@ class _DebtPageState extends State<DebtPage> {
 
   List<Widget> _buildPages() {
     return [
-      ContactsFragement(),
-      RecordsFragement()
+      ContactsFragment(),
+      RecordsFragment()
     ];
   }
 

@@ -34,8 +34,10 @@ class HttpConstants {
 
   static const String GET_INVOICES = '/invoice/getInvoices';
   static const String ADD_INVOICE = '/invoice/addInvoice';
-  static const String UPDATE_INVOICE = '/invoice/updateInvoice';
-  static const String DELETE_INVOICE = '/invoice/deleteInvoice';
+  static const String GET_SYSTEM_WINNING_NUMBERS = '/invoice/getSystemWinningNumbers';
+  static const String GET_USER_WINNING_NUMBERS = '/invoice/getUserWinningNumbers';
+  static const String UPDATE_WINNING_NUMBERS = '/invoice/updateWinningNumbers';
+
 }
 
 class RegexConstant {
@@ -48,6 +50,7 @@ class RegexConstant {
 class SecurityStorageServiceConstant {
   static const String TOKEN = "token";
   static const String ID = "id";
+  static const String PERMISSION = "permission";
   static const String USERNAME = "username";
   static const String EMAIL = "email";
   static const String PHONE = "phone";

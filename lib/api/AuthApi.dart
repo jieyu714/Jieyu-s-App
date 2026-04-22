@@ -72,13 +72,33 @@ class AuthApi {
       if (result.data!["id"] != null) {
         await SecurityStorageService().writeData(SecurityStorageServiceConstant.ID, result.data!["id"]);
       }
+      if (result.data!["permission"] != null) {
+        await SecurityStorageService().writeData(SecurityStorageServiceConstant.PERMISSION, result.data!["permission"].toString());
+      }
     }
 
     return result;
   }
 
   Future<bool> verifyToken() async {
-    return (await _baseApi.request<Map<String, dynamic>>(HttpConstants.VERIFY_TOKEN, {}, null)).isSuccess;
+    final result = await _baseApi.request<Map<String, dynamic>>(HttpConstants.VERIFY_TOKEN, {}, null);
+
+    if (result.isSuccess && result.data != null) {
+      if (result.data!["token"] != null) {
+        await SecurityStorageService().writeData(SecurityStorageServiceConstant.TOKEN, result.data!["token"]);
+      }
+      if (result.data!["username"] != null) {
+        await SecurityStorageService().writeData(SecurityStorageServiceConstant.USERNAME, result.data!["username"]);
+      }
+      if (result.data!["id"] != null) {
+        await SecurityStorageService().writeData(SecurityStorageServiceConstant.ID, result.data!["id"]);
+      }
+      if (result.data!["permission"] != null) {
+        await SecurityStorageService().writeData(SecurityStorageServiceConstant.PERMISSION, result.data!["permission"].toString());
+      }
+    }
+
+    return result.isSuccess;
   }
 
   Future<ApiResponse<Map<String, dynamic>>> getUserInfo() async {

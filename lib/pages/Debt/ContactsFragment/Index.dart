@@ -5,14 +5,14 @@ import 'package:jieyu_app/utils/CustomTextField.dart';
 import 'package:jieyu_app/utils/ProgressDialog.dart';
 import 'package:jieyu_app/viewmodels/Record.dart';
 
-class ContactsFragement extends StatefulWidget {
-  const ContactsFragement({super.key});
+class ContactsFragment extends StatefulWidget {
+  const ContactsFragment({super.key});
 
   @override
-  State<ContactsFragement> createState() => _ContactsFragementState();
+  State<ContactsFragment> createState() => _ContactsFragmentState();
 }
 
-class _ContactsFragementState extends State<ContactsFragement> {
+class _ContactsFragmentState extends State<ContactsFragment> {
   Map<String, List<dynamic>> _groupedContacts = {};
 
   final DebtApi _api = DebtApi();
